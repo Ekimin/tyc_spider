@@ -115,17 +115,19 @@ def load_excel(logfile, company_file):
 def crawl(name, driver):
     print '开始》》》》》》》' + name
     # 打开新窗口
-    #new_window = 'window.open("https://www.tianyancha.com/");'
-    #driver.execute_script(new_window)
+    # new_window = 'window.open("https://www.tianyancha.com/");'
+    # driver.execute_script(new_window)
     # 切换到新的窗口
     handles = driver.window_handles
     driver.switch_to_window(handles[-1])
-
+    time.sleep(0.089)
     driver.get("https://www.tianyancha.com/")
+    time.sleep(0.78)
     driver.find_element_by_xpath('//*[@id="home-main-search"]').send_keys(name)  # 输入名字
     time.sleep(2.34)
     driver.find_element_by_xpath(".//*[@class='input-group-addon search_button']").click()  # 点击搜索
     driver.implicitly_wait(10)
+    time.sleep(0.12)
     driver.find_element_by_xpath('//*[@id="searchTogal"]').click()  # 收起
     time.sleep(0.21)
     # 选择相关度最高的搜索结果 第一条搜索框
@@ -140,44 +142,64 @@ def crawl(name, driver):
     for handle in all_handles:
         if handle != now_handle:
             # 输出待选择的窗口句柄
-            print(handle)
+            # print(handle)
             driver.switch_to.window(handle)
-    # 解析
-    base = driver.find_element_by_xpath("//div[@class='company_header_width ie9Style']/div")
-    name = base.text.split('浏览')[0]
-    tel = base.text.split('电话：')[1].split('邮箱：')[0]
-    liulan = base.text.split('浏览')[1].split('\n')[0]
-    email = base.text.split('邮箱：')[1].split('\n')[0]
-    web = base.text.split('网址：')[1].split('地址')[0]
-    address = base.text.split('地址：')[1]
-    # abstract = driver.find_element_by_xpath("//div[@class='sec-c2 over-hide']//script")
-    tabs = driver.find_elements_by_tag_name('table')
-    rows = tabs[1].find_elements_by_tag_name('tr')
-    cols = rows[0].find_elements_by_tag_name('td' and 'th')
-    # 工商主策号
-    reg_code = rows[0].find_elements_by_tag_name('td')[1].text
-    # 注册地址
-    reg_address = rows[5].find_elements_by_tag_name('td')[1].text
-    # 英文名称
-    english_name = rows[5].find_elements_by_tag_name('td')[1].text
-    # 经营范围
-    ent_range = rows[6].find_elements_by_tag_name('td')[1].text
-    # 统一信用代码
-    creditcode = rows[1].find_elements_by_tag_name('td')[1].text
-    # 纳税人识别号
-    tax_code = rows[2].find_elements_by_tag_name('td')[1].text
-    # 营业期限
-    deadline = rows[3].find_elements_by_tag_name('td')[1].text
-    # 企业类型
-    ent_type = rows[1].find_elements_by_tag_name('td')[3].text
-    idd = str(uuid.uuid1())
-    idd.replace('-', '')
+    time.sleep(0.09)
 
-    based_info = (idd, name, tel, email, web, address, reg_code, reg_address, english_name, ent_range,
-                  creditcode, tax_code, deadline, ent_type, name)
-    # 关闭当前标签页
-    # driver.find_element_by_tag_name('body').send_keys(Keys.COMMAND + 'w')
-    driver.close()
+    try:
+        # 解析
+        base = driver.find_element_by_xpath("//div[@class='company_header_width ie9Style']/div")
+        name = base.text.split('浏览')[0]
+        tel = base.text.split('电话：')[1].split('邮箱：')[0]
+        liulan = base.text.split('浏览')[1].split('\n')[0]
+        email = base.text.split('邮箱：')[1].split('\n')[0]
+        web = base.text.split('网址：')[1].split('地址')[0]
+        address = base.text.split('地址：')[1]
+        # abstract = driver.find_element_by_xpath("//div[@class='sec-c2 over-hide']//script")
+        tabs = driver.find_elements_by_tag_name('table')
+        rows = tabs[1].find_elements_by_tag_name('tr')
+        cols = rows[0].find_elements_by_tag_name('td' and 'th')
+        # 工商注册号
+        reg_code = rows[0].find_elements_by_tag_name('td')[1].text
+        # 注册地址
+        reg_address = rows[5].find_elements_by_tag_name('td')[1].text
+        # 英文名称
+        english_name = rows[5].find_elements_by_tag_name('td')[1].text
+        # 经营范围
+        ent_range = rows[6].find_elements_by_tag_name('td')[1].text
+        # 统一信用代码
+        creditcode = rows[1].find_elements_by_tag_name('td')[1].text
+        # 纳税人识别号
+        tax_code = rows[2].find_elements_by_tag_name('td')[1].text
+        # 营业期限
+        deadline = rows[3].find_elements_by_tag_name('td')[1].text
+        # 企业类型
+        ent_type = rows[1].find_elements_by_tag_name('td')[3].text
+        idd = str(uuid.uuid1())
+        idd.replace('-', '')
+
+        # 法人代表
+        frdb = driver.find_element_by_xpath('//*[@class="f18 overflow-width sec-c3"]/a').text
+        # 注册资本
+        zczb = driver.find_element_by_xpath(
+            '//*[@id="_container_baseInfo"]/div/div[1]/table/tbody/tr/td[2]/div[1]/div[2]/div').text
+        # 企业状态
+        ent_status = driver.find_element_by_xpath('//*[@class="baseinfo-module-content-value statusType1"]').text
+        # 注册时间
+        regi_date = driver.find_element_by_xpath('//*[@class="new-border-bottom pt10"]/div[2]').text
+        # 核准日期
+        hz_date = driver.find_element_by_xpath('//*[@id="_container_baseInfo"]/div/div[2]/table/tbody/tr[4]/td[4]').text
+        # 登记机关
+        regi_unit = driver.find_element_by_xpath(
+            '//*[@id="_container_baseInfo"]/div/div[2]/table/tbody/tr[5]/td[2]').text
+
+        based_info = (idd, name, tel, email, web, address, reg_code, reg_address, english_name, ent_range,
+                      creditcode, tax_code, deadline, ent_type, name, frdb, zczb, ent_status, regi_date, hz_date,
+                      regi_unit)
+        driver.close()
+    except Exception:
+        print '解析出错======='
+        return None
     return based_info
 
 
@@ -185,9 +207,9 @@ def save_data(table):
     conn = pymysql.connect(host='wentuotuo.com', user='root', passwd='root', db='tianyanchatest', port=3306,
                            charset='utf8')
     cur = conn.cursor()  # 获取一个游标
-    sql = "INSERT INTO t1 (id, name, entPhone, entEmail, ent_url, ent_address," \
+    sql = "INSERT INTO gys (id, name, entPhone, entEmail, ent_url, ent_address," \
           " ent_reg_no,ent_reg_address, ent_english_name, ent_range, credit_code, tax_person_code, entDeadline, " \
-          "ent_type, raw_name) VALUES ( '%s', '%s', '%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s' )"
+          "ent_type, raw_name,frdb, zczb, ent_status, regi_date, hz_date, regi_unit) VALUES ( '%s','%s','%s','%s','%s','%s','%s', '%s', '%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s' )"
     cur.execute(sql % table)
     conn.commit()
     cur.close()  # 关闭游标
@@ -198,7 +220,7 @@ if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf-8')
     logfile = 'failed_log.txt'
-    filename = '/Users/heym/PycharmProjects/tyc_spider/data/list.xlsx'
+    filename = '/Users/heym/PycharmProjects/tyc_spider/data/list854.xlsx'
     # 登录
     old_driver = login()
     # 读取excel
