@@ -102,39 +102,39 @@ def load_excel(logfile, company_file):
 
 def crawl(name, driver):
     print '开始》》》》》》》' + name
-    # 打开新窗口
-    # new_window = 'window.open("https://www.tianyancha.com/");'
-    # driver.execute_script(new_window)
-    # 切换到新的窗口
-    handles = driver.window_handles
-    driver.switch_to_window(handles[-1])
-    time.sleep(0.089)
-    driver.get("https://www.tianyancha.com/")
-    time.sleep(0.78)
-    driver.find_element_by_xpath('//*[@id="home-main-search"]').send_keys(name)  # 输入名字
-    time.sleep(2.34)
-    driver.find_element_by_xpath(".//*[@class='input-group-addon search_button']").click()  # 点击搜索
-    driver.implicitly_wait(10)
-    time.sleep(0.12)
-    driver.find_element_by_xpath('//*[@id="searchTogal"]').click()  # 收起
-    time.sleep(0.21)
-    # 选择相关度最高的搜索结果 第一条搜索框
-    tag = driver.find_elements_by_xpath("//div[@class='search_right_item']")
-    if len(tag) == 0:
-        return None
-    tag[0].find_element_by_tag_name('a').click()
-    driver.implicitly_wait(5)
-    # 转化句柄
-    now_handle = driver.current_window_handle
-    all_handles = driver.window_handles
-    for handle in all_handles:
-        if handle != now_handle:
-            # 输出待选择的窗口句柄
-            # print(handle)
-            driver.switch_to.window(handle)
-    time.sleep(0.09)
-
     try:
+        # 打开新窗口
+        # new_window = 'window.open("https://www.tianyancha.com/");'
+        # driver.execute_script(new_window)
+        # 切换到新的窗口
+        handles = driver.window_handles
+        driver.switch_to_window(handles[-1])
+        time.sleep(0.089)
+        driver.get("https://www.tianyancha.com/")
+        time.sleep(0.78)
+        driver.find_element_by_xpath('//*[@id="home-main-search"]').send_keys(name)  # 输入名字
+        time.sleep(2.34)
+        driver.find_element_by_xpath(".//*[@class='input-group-addon search_button']").click()  # 点击搜索
+        driver.implicitly_wait(10)
+        time.sleep(0.12)
+        driver.find_element_by_xpath('//*[@id="searchTogal"]').click()  # 收起
+        time.sleep(0.21)
+        # 选择相关度最高的搜索结果 第一条搜索框
+        tag = driver.find_elements_by_xpath("//div[@class='search_right_item']")
+        if len(tag) == 0:
+            return None
+        tag[0].find_element_by_tag_name('a').click()
+        driver.implicitly_wait(5)
+        # 转化句柄
+        now_handle = driver.current_window_handle
+        all_handles = driver.window_handles
+        for handle in all_handles:
+            if handle != now_handle:
+                # 输出待选择的窗口句柄
+                # print(handle)
+                driver.switch_to.window(handle)
+        time.sleep(0.09)
+
         # 解析
         base = driver.find_element_by_xpath("//div[@class='company_header_width ie9Style']/div")
         name = base.text.split('浏览')[0]
@@ -187,6 +187,7 @@ def crawl(name, driver):
         driver.close()
     except Exception:
         print '解析出错======='
+        driver.close()
         return None
     return based_info
 
