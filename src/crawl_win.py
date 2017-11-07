@@ -102,16 +102,18 @@ def load_excel(logfile, company_file):
 
 def crawl(name, driver):
     print '开始》》》》》》》' + name
+
+    # 打开新窗口
+    # new_window = 'window.open("https://www.tianyancha.com/");'
+    # driver.execute_script(new_window)
+    #  切换到新的窗口
+    handles = driver.window_handles
+    driver.switch_to_window(handles[-1])
+    time.sleep(0.089)
+    driver.get("https://www.tianyancha.com/")
+    time.sleep(0.78)
+
     try:
-        # 打开新窗口
-        # new_window = 'window.open("https://www.tianyancha.com/");'
-        # driver.execute_script(new_window)
-        # 切换到新的窗口
-        handles = driver.window_handles
-        driver.switch_to_window(handles[-1])
-        time.sleep(0.089)
-        driver.get("https://www.tianyancha.com/")
-        time.sleep(0.78)
         driver.find_element_by_xpath('//*[@id="home-main-search"]').send_keys(name)  # 输入名字
         time.sleep(2.34)
         driver.find_element_by_xpath(".//*[@class='input-group-addon search_button']").click()  # 点击搜索
@@ -187,7 +189,9 @@ def crawl(name, driver):
         driver.close()
     except Exception:
         print '解析出错======='
-        driver.close()
+        handles = driver.window_handles
+        if len(handles) > 1:
+            driver.close()
         return None
     return based_info
 
