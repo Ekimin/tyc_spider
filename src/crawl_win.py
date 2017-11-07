@@ -2,21 +2,10 @@
 from selenium import webdriver
 import time
 import xlrd
-from selenium.webdriver import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import pymysql
 import uuid
 import sys
-
-from selenium.webdriver.common.keys import Keys
-
-
-def __init__(self):
-    self.login_url = 'https://www.tianyancha.com/login'
-    self.username = '18002343053'
-    self.password = 'george2009'
-    self.word = '金科'.decode('utf-8')
-    self.detail_url = 'https://www.tianyancha.com/company/334787306'
 
 
 def login():
@@ -219,7 +208,7 @@ if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf-8')
     logfile = 'failed_log.txt'
-    filename = 'D:\Workspace\Pyworkspace\tyc_spider\data\list.xlsx'
+    filename = 'D:\Workspace\Pyworkspace\\tyc_spider\data\last12785list.xlsx'
     # 登录
     old_driver = login()
     # 读取excel
