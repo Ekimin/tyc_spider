@@ -38,29 +38,6 @@ def driver_open():
     return driver
 
 
-def get_content(url):
-    open_driver = driver_open()
-    open_driver.get(url)
-    time.sleep(1)
-    # 获取网页内容
-    content = open_driver.page_source.encode('utf-8')
-    # print content
-    open_driver.close()
-    res_soup = BeautifulSoup(content, 'lxml')
-    com_id = url.split('/')[-1]
-    if com_id.isdigit():
-        return res_soup, com_id
-    else:
-        return res_soup
-
-
-def get_basic_info(soup, company):
-    result_list = soup.select('div.item-line')
-    fddbr = soup.select('div.item-line > span:nth-of-type(2) > a')[0].get_text()
-    result = result_list[0] if len(result_list) > 0 else None
-    print u'法定代表人：' + fddbr  # 打开工作簿
-
-
 def open_excel(file):
     try:
         book = xlrd.open_workbook(file)
@@ -97,15 +74,12 @@ def load_excel(logfile, company_file):
     for sheet in sheets:
         dataset = read_data(sheet)
         cornames.extend(dataset)
+    print "一共获取到" + bytes(len(cornames)) + "个企业"
     return cornames
 
 
 def crawl(name, driver):
     print '开始》》》》》》》' + name
-
-    # 打开新窗口
-    # new_window = 'window.open("https://www.tianyancha.com/");'
-    # driver.execute_script(new_window)
     #  切换到新的窗口
     handles = driver.window_handles
     driver.switch_to_window(handles[-1])
