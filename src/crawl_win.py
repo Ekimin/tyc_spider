@@ -1,4 +1,7 @@
 # coding=utf-8
+import os
+
+from pymysql import OperationalError
 from selenium import webdriver
 import time
 import json
@@ -7,8 +10,25 @@ import pymysql
 import uuid
 import sys
 from datetime import datetime
-
+import logging
 from selenium.common.exceptions import NoSuchElementException
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename='myapp.log',
+                    filemode='w')
+
+#################################################################################################
+# 定义一个StreamHandler，将INFO级别或更高的日志信息打印到标准错误，并将其添加到当前的日志处理对象#
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+
+
+#################################################################################################
 
 
 def login():
@@ -31,11 +51,15 @@ def login():
 
 
 def crawl(name, driver, quest_id):
-    print '开始》》》》》》》' + name
+    logging.info('开始》》》》》》》' + name)
     try:
-        driver.find_element_by_xpath('//*[@id="header-company-search"]').clear()  # 清除文本
+        try:
+            driver.find_element_by_xpath('//*[@id="header-company-search"]').clear()  # 清除文本
+        except:
+            logging.error("----出验证码了，请处理-------")
+            os._exit(0)
         driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys(name.decode('utf-8'))  # 输入名字
-        time.sleep(1.34)
+        time.sleep(1.94)
         driver.find_element_by_xpath('//*[@id="web-header"]/div/div/div[1]/div[2]/div[2]/div[1]/div').click()  # 点击搜索
         driver.implicitly_wait(15)
         time.sleep(0.12)
@@ -51,6 +75,7 @@ def crawl(name, driver, quest_id):
         real_name = detail_tag.text  # 真实名字
         detail_url = detail_tag.get_attribute('href')
         driver.implicitly_wait(5)
+        time.sleep(1.12)
         driver.get(detail_url)  # 获取详情页面
         driver.implicitly_wait(5)
         time.sleep(0.09)
@@ -103,7 +128,7 @@ def crawl(name, driver, quest_id):
                       creditcode, tax_code, deadline, ent_type, frdb, zczb, ent_status, regi_date, hz_date,
                       regi_unit, is_match, now_time)
     except Exception, e:
-        print e.message
+        logging.error(e.message)
         error_quest(quest_id)
         return None
     return based_info
@@ -152,18 +177,24 @@ if __name__ == '__main__':
     logfile = 'failed_log.txt'
     try:
         # 登录
+        logging.info("======开始登录=====")
         old_driver = login()
     except Exception:
-        print '登录出错'
+        logging.error('登录出错')
     while 1:
         # 获取任务
-        r = requests.get("http://10.1.1.157:8011/getquest").text
+        try:
+            r = requests.get("http://wentuotuo.com:8011/getquest").text
+        except:
+            logging.error('获取任务出错,等待重试')
+            time.sleep(10)
+            continue
         req = r.encode('utf-8')
         quest_list = json.loads(r, encoding='utf-8')
         # quest = "43shiu2872834;万达;陈仁飞;大神;王老吉"
-        if len(quest_list)==0:
-            print '没有任务,休眠5秒'
-            time.sleep(5)
+        if len(quest_list) == 0:
+            logging.info('没有任务,休眠10秒')
+            time.sleep(10)
         for quest in quest_list:
             quest_id = quest["quest_id"]
             ent_name = quest["ent_name"]
@@ -172,4 +203,8 @@ if __name__ == '__main__':
             if info is None:
                 continue
             # 判断是否有信息了 todo
-            save_data(info, quest_id)
+            try:
+                save_data(info, quest_id)
+            except OperationalError, e:
+                logging.error("存储结果mysql出错", e.message)
+        time.sleep(3)
