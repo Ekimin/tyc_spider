@@ -75,7 +75,7 @@ def crawl(name, driver, quest_id):
         real_name = detail_tag.text  # 真实名字
         detail_url = detail_tag.get_attribute('href')
         driver.implicitly_wait(5)
-        time.sleep(1.12)
+        time.sleep(3.12)
         driver.get(detail_url)  # 获取详情页面
         driver.implicitly_wait(5)
         time.sleep(0.09)
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     while 1:
         # 获取任务
         try:
-            r = requests.get("http://wentuotuo.com:8011/getquest").text
+            r = requests.get("http://pubvip.org:8011/getquest").text
         except:
             logging.error('获取任务出错,等待重试')
             time.sleep(10)
@@ -203,8 +203,5 @@ if __name__ == '__main__':
             if info is None:
                 continue
             # 判断是否有信息了 todo
-            try:
-                save_data(info, quest_id)
-            except OperationalError, e:
-                logging.error("存储结果mysql出错", e.message)
+            save_data(info, quest_id)
         time.sleep(3)

@@ -46,12 +46,12 @@ def save_data(cornames):
     j = 0
     many_values = []
     status = 'waiting'
-    conn = pymysql.connect(host='wentuotuo.com', user='root', passwd='root', db='tianyanchatest', port=3306,
+    conn = pymysql.connect(host='pubvip.org', user='root', passwd='root', db='tianyanchatest', port=3306,
                            charset='utf8')
     cur = conn.cursor()  # 获取一个游标
     sql = "INSERT INTO quest (quest_id, ent_name, status, input_time) VALUES ( %s,%s,%s,%s)"
     for i in range(len(cornames)):
-        name = cornames[i].strip()
+        name = cornames[i]
         now_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         idd = str(uuid.uuid1())
         idd.replace('-', '')
@@ -74,6 +74,6 @@ def save_data(cornames):
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    filename = 'D:\Workspace\Pyworkspace\\tyc_spider\data\\first3000.xlsx'
+    filename = 'D:\Workspace\Pyworkspace\\tyc_spider\data\\20171121.xlsx'
     cornames = load_excel(filename)
     save_data(cornames)
