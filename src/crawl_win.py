@@ -57,9 +57,9 @@ def crawl(name, driver, quest_id):
         except:
             logging.error("----出验证码了，请处理-------")
             os._exit(0)
-        driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys(name.decode('utf-8'))  # 输入名字
+        # driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys(name.decode('utf-8'))  # 输入名字
 
-        #driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys('郑州米宅科技有限公司'.decode('utf-8'))  # 输入名字
+        driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys('珠海市华鸿木业有限公司'.decode('utf-8'))  # 输入名字
         time.sleep(3.54)
         driver.find_element_by_xpath('//*[@id="web-header"]/div/div/div[1]/div[2]/div[2]/div[1]/div').click()  # 点击搜索
         driver.implicitly_wait(15)
@@ -83,7 +83,7 @@ def crawl(name, driver, quest_id):
 
         # 解析
         # 获取类型
-        type_in_url = driver.find_element_by_xpath('//*[@id="company_web_top"]/div[2]/div[2]/div/p/span').text
+        # type_in_url = driver.find_element_by_xpath('//*[@id="company_web_top"]/div[2]/div[2]/div/p/span').text
         base = driver.find_element_by_xpath("//div[@class='company_header_width ie9Style']/div")
         tel = base.text.split('电话：')[1].split('邮箱：')[0]
         email = base.text.split('邮箱：')[1].split('\n')[0]
