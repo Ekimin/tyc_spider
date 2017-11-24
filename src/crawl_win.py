@@ -1,7 +1,6 @@
-# coding=utf-8
+﻿# coding=utf-8
 import os
 
-from pymysql import OperationalError
 from selenium import webdriver
 import time
 import json
@@ -59,10 +58,10 @@ def crawl(name, driver, quest_id):
             logging.error("----出验证码了，请处理-------")
             os._exit(0)
         driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys(name.decode('utf-8'))  # 输入名字
-        time.sleep(1.94)
+        time.sleep(3.54)
         driver.find_element_by_xpath('//*[@id="web-header"]/div/div/div[1]/div[2]/div[2]/div[1]/div').click()  # 点击搜索
         driver.implicitly_wait(15)
-        time.sleep(0.12)
+        time.sleep(1.12)
         # driver.find_element_by_xpath('//*[@id="searchTogal"]').click()  # 收起
         time.sleep(0.21)
         # 选择相关度最高的搜索结果 第一条搜索结果
@@ -75,7 +74,7 @@ def crawl(name, driver, quest_id):
         real_name = detail_tag.text  # 真实名字
         detail_url = detail_tag.get_attribute('href')
         driver.implicitly_wait(5)
-        time.sleep(3.12)
+        time.sleep(4.12)
         driver.get(detail_url)  # 获取详情页面
         driver.implicitly_wait(5)
         time.sleep(0.09)
@@ -91,7 +90,11 @@ def crawl(name, driver, quest_id):
         # 工商注册号
         reg_code = rows[0].find_elements_by_tag_name('td')[1].text
         # 注册地址
-        reg_address = rows[5].find_elements_by_tag_name('td')[1].text
+        try:
+            reg_address = rows[5].find_elements_by_tag_name('td')[1].text
+        except:
+            reg_address = 'null'
+            logging.error('zhucedizhi error')
         # 经营范围
         ent_range = rows[6].find_elements_by_tag_name('td')[1].text
         # 统一信用代码
@@ -101,24 +104,45 @@ def crawl(name, driver, quest_id):
         # 营业期限
         deadline = rows[3].find_elements_by_tag_name('td')[1].text
         # 企业类型
-        ent_type = rows[1].find_elements_by_tag_name('td')[3].text
+        try:
+            ent_type = rows[1].find_elements_by_tag_name('td')[3].text
+        except:
+            ent_type = 'null'
+            logging.info('qiyeleixing error')
         idd = str(uuid.uuid1())
         idd.replace('-', '')
 
         # 法人代表
         frdb = driver.find_element_by_xpath('//*[@class="f18 overflow-width sec-c3"]/a').text
         # 注册资本
-        zczb = driver.find_element_by_xpath(
-            '//*[@id="_container_baseInfo"]/div/div[1]/table/tbody/tr/td[2]/div[1]/div[2]/div').text
+        try:
+            zczb = driver.find_element_by_xpath(
+                '//*[@id="_container_baseInfo"]/div/div[2]/table/tbody/tr/td[2]/div[1]/div[2]/div').text
+        except:
+            zczb = 'null'
+            logging.error('注册资本 error')
         # 企业状态
         ent_status = driver.find_element_by_xpath('//*[@class="baseinfo-module-content-value statusType1"]').text
         # 注册时间
-        regi_date = driver.find_element_by_xpath('//*[@class="new-border-bottom pt10"]/div[2]').text
+        try:
+            regi_date = driver.find_element_by_xpath('//*[@class="new-border-bottom pt10"]/div[2]').text
+        except:
+            regi_date = 'null'
+            logging.error('注册时间 error')
         # 核准日期
-        hz_date = driver.find_element_by_xpath('//*[@id="_container_baseInfo"]/div/div[2]/table/tbody/tr[4]/td[4]').text
+        try:
+            hz_date = driver.find_element_by_xpath(
+                '//*[@id="_container_baseInfo"]/div/div[3]/table/tbody/tr[4]/td[4]').text
+        except:
+            hz_date = 'null'
+            logging.error('核准日期 error')
         # 登记机关
-        regi_unit = driver.find_element_by_xpath(
-            '//*[@id="_container_baseInfo"]/div/div[2]/table/tbody/tr[5]/td[2]').text
+        try:
+            regi_unit = driver.find_element_by_xpath(
+                '//*[@id="_container_baseInfo"]/div/div[3]/table/tbody/tr[5]/td[2]').text
+        except:
+            regi_unit = 'null'
+            logging.error('登记机关 error')
         now_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         if real_name == name:
             is_match = 'Y'
@@ -203,5 +227,13 @@ if __name__ == '__main__':
             if info is None:
                 continue
             # 判断是否有信息了 todo
-            save_data(info, quest_id)
+            try:
+                save_data(info, quest_id)
+            except:
+                logging.error('存储结果失败,添加任务进error')
+                try:
+                    error_quest(quest_id)
+                except:
+                    logging.error('添加任务进error表也失败了，停止程序！')
+                    os._exit(0)
         time.sleep(3)
