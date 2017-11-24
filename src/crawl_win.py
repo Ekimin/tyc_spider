@@ -40,7 +40,7 @@ def login():
         '//*[@id="web-content"]/div/div/div/div[2]/div/div[2]/div[2]/div[2]/div[2]/input').send_keys("18761671816")
     old_driver.find_element_by_xpath(
         '//*[@id="web-content"]/div/div/div/div[2]/div/div[2]/div[2]/div[2]/div[3]/input').send_keys("123456abc")
-    time.sleep(0.3)
+    time.sleep(2.3)
     old_driver.find_element_by_xpath(
         '//*[@id="web-content"]/div/div/div/div[2]/div/div[2]/div[2]/div[2]/div[5]').click()
     time.sleep(0.14)
@@ -58,6 +58,8 @@ def crawl(name, driver, quest_id):
             logging.error("----出验证码了，请处理-------")
             os._exit(0)
         driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys(name.decode('utf-8'))  # 输入名字
+
+        #driver.find_element_by_xpath('//*[@id="header-company-search"]').send_keys('郑州米宅科技有限公司'.decode('utf-8'))  # 输入名字
         time.sleep(3.54)
         driver.find_element_by_xpath('//*[@id="web-header"]/div/div/div[1]/div[2]/div[2]/div[1]/div').click()  # 点击搜索
         driver.implicitly_wait(15)
@@ -80,6 +82,8 @@ def crawl(name, driver, quest_id):
         time.sleep(0.09)
 
         # 解析
+        # 获取类型
+        type_in_url = driver.find_element_by_xpath('//*[@id="company_web_top"]/div[2]/div[2]/div/p/span').text
         base = driver.find_element_by_xpath("//div[@class='company_header_width ie9Style']/div")
         tel = base.text.split('电话：')[1].split('邮箱：')[0]
         email = base.text.split('邮箱：')[1].split('\n')[0]
@@ -88,7 +92,15 @@ def crawl(name, driver, quest_id):
         tabs = driver.find_elements_by_tag_name('table')
         rows = tabs[1].find_elements_by_tag_name('tr')
         # 工商注册号
-        reg_code = rows[0].find_elements_by_tag_name('td')[1].text
+        try:
+            reg_code = rows[0].find_elements_by_tag_name('td')[1].text
+        except:
+            try:
+                reg_code = driver.find_element_by_xpath(
+                    '//*[@id="_container_baseInfo"]/div/div[3]/table/tbody/tr[1]/td[2]').text
+            except:
+                reg_code = 'null'
+                logging.error('工商注册号 error')
         # 注册地址
         try:
             reg_address = rows[5].find_elements_by_tag_name('td')[1].text
@@ -96,13 +108,21 @@ def crawl(name, driver, quest_id):
             reg_address = 'null'
             logging.error('zhucedizhi error')
         # 经营范围
-        ent_range = rows[6].find_elements_by_tag_name('td')[1].text
+        try:
+            ent_range = rows[6].find_elements_by_tag_name('td')[1].text
+        except:
+            ent_range = 'null'
+            logging.error('经营范围 error')
         # 统一信用代码
         creditcode = rows[1].find_elements_by_tag_name('td')[1].text
         # 纳税人识别号
         tax_code = rows[2].find_elements_by_tag_name('td')[1].text
         # 营业期限
-        deadline = rows[3].find_elements_by_tag_name('td')[1].text
+        try:
+            deadline = rows[3].find_elements_by_tag_name('td')[1].text
+        except:
+            deadline = 'null'
+            logging.error('营业期限 error')
         # 企业类型
         try:
             ent_type = rows[1].find_elements_by_tag_name('td')[3].text
@@ -113,7 +133,10 @@ def crawl(name, driver, quest_id):
         idd.replace('-', '')
 
         # 法人代表
-        frdb = driver.find_element_by_xpath('//*[@class="f18 overflow-width sec-c3"]/a').text
+        try:
+            frdb = driver.find_element_by_xpath('//*[@class="f18 overflow-width sec-c3"]/a').text
+        except:
+            frdb = driver.find_element_by_xpath('//*[@id="_container_baseInfo"]/div/div/table/tbody/tr/td[1]').text
         # 注册资本
         try:
             zczb = driver.find_element_by_xpath(
@@ -122,7 +145,19 @@ def crawl(name, driver, quest_id):
             zczb = 'null'
             logging.error('注册资本 error')
         # 企业状态
-        ent_status = driver.find_element_by_xpath('//*[@class="baseinfo-module-content-value statusType1"]').text
+        try:
+            ent_status = driver.find_element_by_xpath('//*[@class="baseinfo-module-content-value statusType1"]').text
+        except:
+            try:
+                ent_status = driver.find_element_by_xpath(
+                    '//*[@id="_container_baseInfo"]/div/div[2]/table/tbody/tr/td[2]/div[3]/div[2]/div').text
+            except:
+                try:
+                    ent_status = driver.find_element_by_xpath(
+                        '//*[@id="_container_baseInfo"]/div/div/table/tbody/tr/td[4]').text
+                except:
+                    ent_status = 'null'
+                    logging.error('企业状态 error')
         # 注册时间
         try:
             regi_date = driver.find_element_by_xpath('//*[@class="new-border-bottom pt10"]/div[2]').text

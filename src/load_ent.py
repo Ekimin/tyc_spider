@@ -74,6 +74,6 @@ def save_data(cornames):
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    filename = 'D:\Workspace\Pyworkspace\\tyc_spider\data\\20171121.xlsx'
+    filename = 'D:\Workspace\Pyworkspace\\tyc_spider\data\\201711241119.xlsx'
     cornames = load_excel(filename)
     save_data(cornames)
